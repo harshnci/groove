@@ -11,6 +11,52 @@
 
 		public function login($un, $pw){
 
+			$stmt = mysqli_prepare($this->con, "SELECT password, fail FROM users WHERE username = ?");
+			mysqli_stmt_bind_param($stmt, "s", $un);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_bind_result($stmt, $col1, $failatt);
+			mysqli_stmt_fetch($stmt);
+			mysqli_stmt_fetch($stmt);
+			if($col1){
+				if($failatt < 3) {
+					if (password_verify($pw, $col1)) {
+						$stmt = mysqli_prepare($this->con, "UPDATE users SET fail = '0' WHERE username = ?");
+						mysqli_stmt_bind_param($stmt, "s", $un);
+						mysqli_stmt_execute($stmt);
+						//mysqli_query($this->con, "UPDATE users SET fail = '0' WHERE username = '$un'");
+			    		return true;
+					} 
+					else {
+						$failatt = $failatt + 1;
+						if($failatt == 3){
+							/*$stmt = mysqli_prepare($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE username = ?");
+							mysqli_stmt_bind_param($stmt, "s", $un);
+							mysqli_stmt_execute($stmt);*/
+							mysqli_query($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE password = '$col1'");
+							//mysqli_query($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE username = '$un'");
+						}
+						$stmt = mysqli_prepare($this->con, "UPDATE users SET fail = '$failatt' WHERE username = ?");
+						mysqli_stmt_bind_param($stmt, "s", $un);
+						mysqli_stmt_execute($stmt);
+						//mysqli_query($this->con, "UPDATE users SET fail = '$failatt' WHERE username = '$un'");
+						array_push($this->errorArray, Constants::$loginFailed);
+						return false;
+					}
+				}
+				else{
+					array_push($this->errorArray, Constants::$loginLock);
+					return false;
+				}
+			}
+			else{
+				array_push($this->errorArray, Constants::$loginFailed);
+				return false;
+			}
+			
+			
+		}
+		/*public function login($un, $pw){
+
 			$stmt = mysqli_prepare($this->con, "SELECT password FROM users WHERE username = ?");
 			mysqli_stmt_bind_param($stmt, "s", $un);
 			mysqli_stmt_execute($stmt);
@@ -29,7 +75,7 @@
 				array_push($this->errorArray, Constants::$loginFailed);
 				return false;
 			}
-					}
+		}*/
 
 		public function register($un, $fn, $ln, $em, $em2, $pw, $pw2) {
 			$this->validateUsername($un);
@@ -86,8 +132,14 @@
 				return;
 			}
 
-			$checkUsernameQuery = mysqli_query($this->con, "SELECT username FROM users WHERE username='$un'");
-			if(mysqli_num_rows($checkUsernameQuery) != 0) {
+			$stmt = mysqli_prepare($this->con, "SELECT username FROM users WHERE username= ?");
+			mysqli_stmt_bind_param($stmt, "s", $un);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_bind_result($stmt, $uname);
+			mysqli_stmt_fetch($stmt);
+
+			//$checkUsernameQuery = mysqli_query($this->con, "SELECT username FROM users WHERE username='$un'");
+			if($uname) {
 				array_push($this->errorArray, Constants::$usernameTaken);
 				return;
 			}
@@ -119,8 +171,13 @@
 				return;
 			}
 
-			$checkEmailQuery = mysqli_query($this->con, "SELECT email FROM users WHERE email='$em'");
-			if(mysqli_num_rows($checkEmailQuery) != 0) {
+			$stmt = mysqli_prepare($this->con, "SELECT email FROM users WHERE email=?");
+			mysqli_stmt_bind_param($stmt, "s", $em);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_bind_result($stmt, $maile);
+			mysqli_stmt_fetch($stmt);
+			//$checkEmailQuery = mysqli_query($this->con, "SELECT email FROM users WHERE email='$em'");
+			if($maile) {
 				array_push($this->errorArray, Constants::$emailTaken);
 				return;
 			}

@@ -19,8 +19,32 @@
 <head>
 	<title>Welcome to Slotify!</title>
 	<link rel="stylesheet" type="text/css" href="assets/css/register.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="assets/js/register.js"></script>
 </head>
 <body>
+	<?php
+
+	if(isset($_POST['registerButton'])) {
+		echo '<script>
+				$(document).ready(function(){
+				$("#loginForm").hide();
+				$("#registerForm").show();
+				});
+			</script>';
+	}
+	else {
+		echo '<script>
+				$(document).ready(function(){
+				$("#loginForm").show();
+				$("#registerForm").hide();
+				});
+			</script>';
+	}
+
+	?>
+
 	<div id="background">
 		<div id="loginContainer">
 			<div id="inputContainer">
@@ -28,8 +52,9 @@
 					<h2>Login to your account</h2>
 					<p>
 						<?php echo $account->getError(Constants::$loginFailed); ?>
+						<?php echo $account->getError(Constants::$loginLock); ?>
 						<label for="loginUsername">Username</label>
-						<input id="loginUsername" name="loginUsername" type="text" placeholder="e.g. bartSimpson" required>
+						<input id="loginUsername" name="loginUsername" type="text" placeholder="e.g. bartSimpson" value="<?php getInputValue('loginUsername') ?>" required>
 					</p>
 					<p>
 						<label for="loginPassword">Password</label>
@@ -37,6 +62,10 @@
 					</p>
 
 					<button type="submit" name="loginButton">LOG IN</button>
+
+					<div class="hasAccountText">
+						<span id="hideLogin">Don't have an account yet? Signup here.</span>
+					</div>
 					
 				</form>
 
@@ -91,10 +120,21 @@
 
 					<button type="submit" name="registerButton">SIGN UP</button>
 					
+					<div class="hasAccountText">
+						<span id="hideRegister">Already have an account yet? Login here.</span>
+					</div>
 				</form>
 
 
 			</div>
+			<div id="loginText">
+				<h1>Get great music, right now</h1>
+				<h2>Listen to loads of songs for free</h2>
+				<ul>
+					<li>Discover music you'll fall in love with</li>
+					<li>Create your own playlists</li>
+					<li>Follow artists to keep up to date</li>
+				</ul>
 		</div>
 	</div>
 
