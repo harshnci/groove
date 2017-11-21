@@ -38,7 +38,6 @@
 						$stmt = mysqli_prepare($this->con, "UPDATE users SET fail = '$failatt' WHERE username = ?");
 						mysqli_stmt_bind_param($stmt, "s", $un);
 						mysqli_stmt_execute($stmt);
-						//mysqli_query($this->con, "UPDATE users SET fail = '$failatt' WHERE username = '$un'");
 						array_push($this->errorArray, Constants::$loginFailed);
 						return false;
 					}
@@ -55,27 +54,6 @@
 			
 			
 		}
-		/*public function login($un, $pw){
-
-			$stmt = mysqli_prepare($this->con, "SELECT password FROM users WHERE username = ?");
-			mysqli_stmt_bind_param($stmt, "s", $un);
-			mysqli_stmt_execute($stmt);
-			mysqli_stmt_bind_result($stmt, $col1);
-			mysqli_stmt_fetch($stmt);
-			if($col1) {
-				if (password_verify($pw, $col1)) {
-			    	return true;
-				} 
-				else {
-					array_push($this->errorArray, Constants::$loginFailed);
-					return false;
-				}
-			}
-			else {
-				array_push($this->errorArray, Constants::$loginFailed);
-				return false;
-			}
-		}*/
 
 		public function register($un, $fn, $ln, $em, $em2, $pw, $pw2) {
 			$this->validateUsername($un);
@@ -85,7 +63,6 @@
 			$this->validatePasswords($pw, $pw2);
 
 			if(empty($this->errorArray) == true) {
-				//Insert into db
 				$this->insertUserDetails($un, $fn, $ln, $em, $pw);
 				return true;
 			}
