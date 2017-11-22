@@ -15,14 +15,24 @@
 			$this->con = $con;
 			$this->id = $id;
 
-			$query = mysqli_query($this->con, "SELECT * FROM songs WHERE id='$this->id'");
+
+
+			$stmt = mysqli_prepare($this->con, "SELECT title,artist,album,genre,duration,path FROM songs WHERE id=?");
+			mysqli_stmt_bind_param($stmt, "s", $this->id);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_bind_result($stmt, $this->title, $this->artistId, $this->albumId, $this->genre, $this->duration, $this->path);
+			while (mysqli_stmt_fetch($stmt)) {
+    		}
+
+
+			/*$query = mysqli_query($this->con, "SELECT * FROM songs WHERE id='$this->id'");
 			$this->mysqliData = mysqli_fetch_array($query);
 			$this->title = $this->mysqliData['title'];
 			$this->artistId = $this->mysqliData['artist'];
 			$this->albumId = $this->mysqliData['album'];
 			$this->genre = $this->mysqliData['genre'];
 			$this->duration = $this->mysqliData['duration'];
-			$this->path = $this->mysqliData['path'];
+			$this->path = $this->mysqliData['path'];*/
 
 
 		}
