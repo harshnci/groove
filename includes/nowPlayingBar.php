@@ -18,20 +18,80 @@ $jsonArray = json_encode($resultArray);
 		currentPlaylist = <?php echo $jsonArray; ?>;
 		audioElement = new Audio();
 		setTrack(currentPlaylist[0], currentPlaylist, false);
+
 	});
 
+	function prevSong() {
+		if(audioElement.audio.currentTime >= 3 || currentIndex == 0) {
+			audioElement.audio.currentTime = 0;
+		}
+		else {
+			currentIndex = currentIndex - 1;
+			setTrack(currentPlaylist[currentIndex], currentPlaylist, true);
+		}
+	}
+
+	function nextSong() {
+		console.log(currentIndex);
+		//console.log(repeat);
+		if(repeat == true) {
+			audioElement.audio.currentTime = 0;
+			return;
+		}
+		/*if(repeat == 1) {
+			audioElement.setTime();
+			playSong();
+			return;
+		}*/
+
+		if(currentIndex == currentPlaylist.length - 1) {
+			currentIndex = 0;
+		}
+		else {
+			currentIndex = currentIndex + 1;
+		}
+
+		var trackToPlay = currentPlaylist[currentIndex];
+		setTrack(trackToPlay, currentPlaylist, true);
+		console.log(currentIndex);
+	}
+
+	function setRepeat() {
+		repeat = !repeat;
+		var imageName = repeat ? "repeat-active.png" : "repeat.png";
+		$(".controlButton.repeat img").attr("src", "assets/images/icons/" + imageName);
+	}
+
 	function setTrack(trackId, newPlaylist, play) {
+
+		if(currentPlaylist != newPlaylist) {
+			currentPlaylist = newPlaylist;
+		}
+		currentIndex = currentPlaylist.indexOf(trackId);
+		console.log(currentIndex);
+		pauseSong();
 
 		$.post("includes/handlers/ajax/getSongJson.php", { songId: trackId}, function(data){
 
 			var track = JSON.parse(data);
+			currentIndex = currentPlaylist.indexOf(trackId);
+			$(".trackName span").text(track.title);
 
-			console.log(track);
+			$.post("includes/handlers/ajax/getArtistJson.php", { artistId: track.artist}, function(data){
+				var artist = JSON.parse(data);
+				$(".artistName span").text(artist.name);
+			});
+
+			$.post("includes/handlers/ajax/getAlbumJson.php", { albumId: track.album}, function(data){
+				var album = JSON.parse(data);
+				$(".albumLink img").attr("src", album.artworkPath);
+			});
+
 			audioElement.setTrack(track.path);
-			audioElement.play();
+			//audioElement.play();
+			playSong();
 		});
-
-		if(play) {
+		if(play == true) {
 			audioElement.play();	
 		}
 
@@ -61,18 +121,18 @@ $jsonArray = json_encode($resultArray);
 			<div class="content">
 
 				<span class="albumLink">
-					<img src="https://i.ytimg.com/vi/rb8Y38eilRM/maxresdefault.jpg" class="albumArtwork">
+					<img src="" class="albumArtwork">
 				</span>
 				<div class="trackInfo">
 
 					<span class="trackName">
 
-						<span>Hello</span>
+						<span></span>
 						
 					</span>
 					<span class="artistName">
 
-						<span>You</span>
+						<span></span>
 						
 					</span>
 					
@@ -90,7 +150,7 @@ $jsonArray = json_encode($resultArray);
 						<img src="assets/images/icons/shuffle.png" alt="Shuffle">
 					</button>
 
-					<button class="controlButton previous" title="Previous button">
+					<button class="controlButton previous" title="Previous button" onclick="prevSong()">
 						<img src="assets/images/icons/previous.png" alt="Previous">
 					</button>
 
@@ -102,11 +162,11 @@ $jsonArray = json_encode($resultArray);
 						<img src="assets/images/icons/pause.png" alt="pause">
 					</button>
 
-					<button class="controlButton next" title="Next button">
+					<button class="controlButton next" title="Next button" onclick="nextSong()">
 						<img src="assets/images/icons/next.png" alt="Next">
 					</button>
 
-					<button class="controlButton repeat" title="Repeat button">
+					<button class="controlButton repeat" title="Repeat button" onclick="setRepeat()">
 						<img src="assets/images/icons/repeat.png" alt="Repeat">
 					</button>
 					
