@@ -2,9 +2,9 @@
 
 	<nav class="navBar">
 					
-		<a href="index.php" class="logo">
+		<span  class="logo" onclick="openPage('index.php')">
 			<img src="assets/images/icons/logo.png">
-		</a> 
+		</span> 
 
 		<div class="group">
 
@@ -18,15 +18,12 @@
 
 		<div class="group">
 			<div class="navItem">
-				<a href="browse.php" class="navItemLink">Browse</a>
+				<span onclick="openPage('browse.php')" class="navItemLink">Browse</span>
 			</div>
 
-			<div class="navItem">
-				<a href="yourMusic.php" class="navItemLink">Your music</a>
-			</div>
 
 			<div class="navItem">
-				<a href="profile.php" class="navItemLink">Harsh</a>
+				<span onclick="openPage('settings.php')" class="navItemLink"><?php echo htmlspecialchars($userLoggedIn->getFirstAndLastName()); ?></span>
 			</div>
 						
 		</div>

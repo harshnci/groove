@@ -11,29 +11,42 @@
 
 		public function login($un, $pw){
 
-			$stmt = mysqli_prepare($this->con, "SELECT password, fail FROM users WHERE username = ?");
+			$stmt = mysqli_prepare($this->con, "SELECT salt,passworda, fail FROM users WHERE username = ?");
+			mysqli_stmt_bind_param($stmt, "s", $un);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_bind_result($stmt, $sess, $col1, $failatt);
+			mysqli_stmt_fetch($stmt);
+			mysqli_stmt_fetch($stmt);
+			mysqli_stmt_fetch($stmt);
+	
+
+			$pword = hash('sha256', $pw );
+			$revv2 = strrev($sess . $pword);
+			$encryPw = hash('sha256', $revv2 );
+
+
+
+			/*
+			$stmt = mysqli_prepare($this->con, "SELECT passworda, fail FROM users WHERE username = ?");
 			mysqli_stmt_bind_param($stmt, "s", $un);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_bind_result($stmt, $col1, $failatt);
 			mysqli_stmt_fetch($stmt);
-			mysqli_stmt_fetch($stmt);
+			mysqli_stmt_fetch($stmt);*/
+
 			if($col1){
 				if($failatt < 3) {
-					if (password_verify($pw, $col1)) {
+					if ($encryPw == $col1) {
+					//if (password_verify($pw, $col1)) {
 						$stmt = mysqli_prepare($this->con, "UPDATE users SET fail = '0' WHERE username = ?");
 						mysqli_stmt_bind_param($stmt, "s", $un);
 						mysqli_stmt_execute($stmt);
-						//mysqli_query($this->con, "UPDATE users SET fail = '0' WHERE username = '$un'");
 			    		return true;
 					} 
 					else {
 						$failatt = $failatt + 1;
 						if($failatt == 3){
-							/*$stmt = mysqli_prepare($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE username = ?");
-							mysqli_stmt_bind_param($stmt, "s", $un);
-							mysqli_stmt_execute($stmt);*/
-							mysqli_query($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE password = '$col1'");
-							//mysqli_query($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE username = '$un'");
+							mysqli_query($this->con, "CREATE EVENT slotify_ts ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 20 SECOND DO UPDATE users SET fail = '0' WHERE passworda = '$col1'");
 						}
 						$stmt = mysqli_prepare($this->con, "UPDATE users SET fail = '$failatt' WHERE username = ?");
 						mysqli_stmt_bind_param($stmt, "s", $un);
@@ -50,9 +63,7 @@
 			else{
 				array_push($this->errorArray, Constants::$loginFailed);
 				return false;
-			}
-			
-			
+			}	
 		}
 
 		public function register($un, $fn, $ln, $em, $em2, $pw, $pw2) {
@@ -69,7 +80,6 @@
 			else {
 				return false;
 			}
-
 		}
 
 		public function getError($error) {
@@ -80,27 +90,42 @@
 		}
 
 		private function insertUserDetails($un, $fn, $ln, $em, $pw) {
-			//$salt = $this->rand_str();
+			//$saltplain = $this->rand_str();
+			$salthash = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
+			//$salthash = hash('sha256', '$saltplain' );
+			$pwordhash = hash('sha256', $pw);
+			$revv = strrev($salthash . $pwordhash);
+			$encryptedPw = hash('sha256', $revv );
+			$profilePic = "assets/images/profile-pics/head_emerald.png";
+			$date = date("Y-m-d");
+			$stmt = mysqli_prepare($this->con, "INSERT INTO users (username, salt, firstname, lastname, email, passworda, signUpDate, profilepic) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+			mysqli_stmt_bind_param($stmt, "ssssssss", $un, $salthash, $fn, $ln, $em, $encryptedPw, $date, $profilePic);
+			mysqli_stmt_execute($stmt);
+			$result = mysqli_stmt_fetch($stmt);
+			return;			
+
+			/*
 			$encryptedPw = password_hash($pw, PASSWORD_BCRYPT);
 			$profilePic = "assets/images/profile-pics/head_emerald.png";
 			$date = date("Y-m-d");
-			$stmt = mysqli_prepare($this->con, "INSERT INTO users (username, firstname, lastname, email, password, signUpDate, profilepic) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			$stmt = mysqli_prepare($this->con, "INSERT INTO users (username, firstname, lastname, email, passworda, signUpDate, profilepic) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			mysqli_stmt_bind_param($stmt, "sssssss", $un, $fn, $ln, $em, $encryptedPw, $date, $profilePic);
 			mysqli_stmt_execute($stmt);
 			$result = mysqli_stmt_fetch($stmt);
-			return;
+			return;*/
 		}
 
-		/*
-		private function rand_str() {
+		
+		/*private function rand_str() {
     		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";  
     		$size = strlen( $chars );
+    		$str = "";
     		for( $i = 0; $i < 10; $i++ ) {
         		$str .= $chars[ rand( 0, $size - 1 ) ];
    	 		}
     		return $str;
-		}
-		*/
+		}*/
+		
 
 		private function validateUsername($un) {
 
@@ -108,19 +133,15 @@
 				array_push($this->errorArray, Constants::$usernameCharacters);
 				return;
 			}
-
 			$stmt = mysqli_prepare($this->con, "SELECT username FROM users WHERE username= ?");
 			mysqli_stmt_bind_param($stmt, "s", $un);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_bind_result($stmt, $uname);
 			mysqli_stmt_fetch($stmt);
-
-			//$checkUsernameQuery = mysqli_query($this->con, "SELECT username FROM users WHERE username='$un'");
 			if($uname) {
 				array_push($this->errorArray, Constants::$usernameTaken);
 				return;
 			}
-
 		}
 
 		private function validateFirstName($fn) {
@@ -153,33 +174,25 @@
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_bind_result($stmt, $maile);
 			mysqli_stmt_fetch($stmt);
-			//$checkEmailQuery = mysqli_query($this->con, "SELECT email FROM users WHERE email='$em'");
 			if($maile) {
 				array_push($this->errorArray, Constants::$emailTaken);
 				return;
 			}
-
 		}
 
 		private function validatePasswords($pw, $pw2) {
-			
 			if($pw != $pw2) {
 				array_push($this->errorArray, Constants::$passwordsDoNoMatch);
 				return;
 			}
-
 			if(preg_match('/[^A-Za-z0-9]/', $pw)) {
 				array_push($this->errorArray, Constants::$passwordNotAlphanumeric);
 				return;
 			}
-
 			if(strlen($pw) > 30 || strlen($pw) < 5) {
 				array_push($this->errorArray, Constants::$passwordCharacters);
 				return;
 			}
-
 		}
-
-
 	}
 ?>

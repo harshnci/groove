@@ -14,17 +14,12 @@
 		public function __construct($con, $id) {
 			$this->con = $con;
 			$this->id = $id;
-
-
-
-			$stmt = mysqli_prepare($this->con, "SELECT title,artist,album,genre,duration,path FROM songs WHERE id=?");
+			$stmt = mysqli_prepare($this->con, "SELECT title,artist,album,genre,duration,patha FROM songs WHERE id=?");
 			mysqli_stmt_bind_param($stmt, "s", $this->id);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_bind_result($stmt, $this->title, $this->artistId, $this->albumId, $this->genre, $this->duration, $this->path);
 			while (mysqli_stmt_fetch($stmt)) {
     		}
-
-
 			/*$query = mysqli_query($this->con, "SELECT * FROM songs WHERE id='$this->id'");
 			$this->mysqliData = mysqli_fetch_array($query);
 			$this->title = $this->mysqliData['title'];
@@ -33,8 +28,6 @@
 			$this->genre = $this->mysqliData['genre'];
 			$this->duration = $this->mysqliData['duration'];
 			$this->path = $this->mysqliData['path'];*/
-
-
 		}
 
 		public function getTitle() {
@@ -67,9 +60,6 @@
 
 		public function getMysqliData() {
 			return $this->mysqlidata;
-		}
-
-		
+		}	
 	}
-
 ?>

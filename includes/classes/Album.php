@@ -8,12 +8,9 @@
 		private $genre;
 		private $artworkPath;
 
-
-
 		public function __construct($con, $id) {
 			$this->con = $con;
 			$this->id = $id;
-
 
 			$stmt = mysqli_prepare($this->con, "SELECT title,artist,genre,artworkPath FROM albums WHERE id=?");
 			mysqli_stmt_bind_param($stmt, "s", $this->id);

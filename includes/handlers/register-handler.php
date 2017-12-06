@@ -33,6 +33,8 @@ if(isset($_POST['registerButton'])) {
 
 	if($wasSuccessful == true) {
 		$_SESSION['userLoggedIn'] = $username;
+		$token = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+		$_SESSION['csrftoken'] = $token;
 		header("Location: index.php");
 	}
 

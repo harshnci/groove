@@ -1,14 +1,17 @@
 <?php
 
 include("includes/config.php");
+include("includes/classes/User.php");
 include("includes/classes/Artist.php");
 include("includes/classes/Album.php");
 include("includes/classes/Song.php");
 
-//session_destroy(); LOGOUT
-
 if(isset($_SESSION['userLoggedIn'])) {
-	$userLoggedIn = $_SESSION['userLoggedIn'];
+	$userLoggedIn = new User($con, $_SESSION['userLoggedIn']);
+	$username = $userLoggedIn->getUsername();
+	$csrftoken = $_SESSION['csrftoken'];
+	echo "<script>userLoggedIn = '$username';</script>";
+	echo "<script>csrfToken = '$csrftoken';</script>";
 }
 else {
 	header("Location: register.php");

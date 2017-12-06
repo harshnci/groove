@@ -1,8 +1,7 @@
-<?php include("includes/header.php");  
+<?php include("includes/includedFiles.php");
 
 if(isset($_GET['id'])) {
 	$albumId = $_GET['id'];
-
 }
 else {
 	header("Location: index.php");
@@ -51,11 +50,6 @@ $artist = $album->getArtist();
 
 						</div>
 
-						<div class='trackOptions'>
-							<img class='optionsButton' src='assets/images/icons/more.png'>
-
-						</div>
-
 						<div class='trackDuration'>
 							<span class='duration'>" . $albumSong->getDuration() . "</span>
 						</div>
@@ -81,14 +75,3 @@ $artist = $album->getArtist();
 	
 
 </div>
-
-
-
-
-
-
-
-
-
-
-<?php include("includes/footer.php");  ?>

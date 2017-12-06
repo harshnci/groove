@@ -32,25 +32,16 @@ $jsonArray = json_encode($resultArray);
 	}
 
 	function nextSong() {
-		console.log(currentIndex);
-		//console.log(repeat);
 		if(repeat == true) {
 			audioElement.audio.currentTime = 0;
 			return;
 		}
-		/*if(repeat == 1) {
-			audioElement.setTime();
-			playSong();
-			return;
-		}*/
-
 		if(currentIndex == currentPlaylist.length - 1) {
 			currentIndex = 0;
 		}
 		else {
 			currentIndex = currentIndex + 1;
 		}
-
 		var trackToPlay = currentPlaylist[currentIndex];
 		setTrack(trackToPlay, currentPlaylist, true);
 		console.log(currentIndex);
@@ -84,17 +75,15 @@ $jsonArray = json_encode($resultArray);
 
 			$.post("includes/handlers/ajax/getAlbumJson.php", { albumId: track.album}, function(data){
 				var album = JSON.parse(data);
+				//console.log(album);
 				$(".albumLink img").attr("src", album.artworkPath);
 			});
 
 			audioElement.setTrack(track.path);
-			//audioElement.play();
-			playSong();
+			if(play == true) {
+				playSong();	
+			}
 		});
-		if(play == true) {
-			audioElement.play();	
-		}
-
 	}
 
 	function playSong() {
@@ -111,8 +100,6 @@ $jsonArray = json_encode($resultArray);
 
 
 </script>
-
-
 
 <div id="nowPlayingBarContainer"> 
 	<div id="nowPlayingBar">
