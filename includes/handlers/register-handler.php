@@ -32,6 +32,7 @@ if(isset($_POST['registerButton'])) {
 	$wasSuccessful = $account->register($username, $firstName, $lastName, $email, $email2, $password, $password2);
 
 	if($wasSuccessful == true) {
+		session_regenerate_id();
 		$_SESSION['userLoggedIn'] = $username;
 		$token = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
 		$_SESSION['csrftoken'] = $token;

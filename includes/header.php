@@ -10,6 +10,12 @@ if(isset($_SESSION['userLoggedIn'])) {
 	$userLoggedIn = new User($con, $_SESSION['userLoggedIn']);
 	$username = $userLoggedIn->getUsername();
 	$csrftoken = $_SESSION['csrftoken'];
+
+	$stmt = mysqli_prepare($con, "UPDATE users SET sessionvar = '$csrftoken' WHERE username = ?");
+	mysqli_stmt_bind_param($stmt, "s", $username);
+	mysqli_stmt_execute($stmt);
+	mysqli_stmt_close($stmt);
+
 	echo "<script>userLoggedIn = '$username';</script>";
 	echo "<script>csrfToken = '$csrftoken';</script>";
 }

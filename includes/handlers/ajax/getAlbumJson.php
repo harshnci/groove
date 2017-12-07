@@ -7,7 +7,6 @@ if(isset($_POST['albumId'])) {
 	$stmt = mysqli_prepare($con, "SELECT * FROM albums WHERE id = ?");
 	mysqli_stmt_bind_param($stmt, "s", $albumId);
 	mysqli_stmt_execute($stmt);
-	//mysqli_stmt_store_result($stmt);
 	mysqli_stmt_bind_result($stmt, $row[0], $row[1], $row[2], $row[3], $row[4]);
 	while (mysqli_stmt_fetch($stmt)) {
     }

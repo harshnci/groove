@@ -59,10 +59,8 @@ $artist = $album->getArtist();
 
 				$i = $i + 1;
 
-
 			}
 		?>
-
 		<script>
 			
 			var tempSongIds = '<?php echo json_encode($songIdArray); ?>';

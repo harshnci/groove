@@ -15,11 +15,21 @@ if($_POST['oldPassword'] == "" || $_POST['newPassword1'] == ""  || $_POST['newPa
 	echo "Please fill in all fields";
 	exit();
 }
-if($_SESSION['csrftoken'] == $_POST['csrf']) {
-	$username = $_POST['username'];
-	$oldPassword = $_POST['oldPassword'];
-	$newPassword1 = $_POST['newPassword1'];
-	$newPassword2 = $_POST['newPassword2'];
+
+$username = $_POST['username'];
+$oldPassword = $_POST['oldPassword'];
+$newPassword1 = $_POST['newPassword1'];
+$newPassword2 = $_POST['newPassword2'];
+
+$stmt = mysqli_prepare($con, "SELECT sessionvar FROM users WHERE username = ?");
+mysqli_stmt_bind_param($stmt, "s", $username);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_result($stmt, $sess);
+mysqli_stmt_fetch($stmt);
+mysqli_stmt_close($stmt);
+
+if($sess == $_POST['csrf']) {
+	
 	$newencryptedPw = password_hash($newPassword1, PASSWORD_BCRYPT);
 
 	$stmt = mysqli_prepare($con, "SELECT salt, passworda FROM users WHERE username = ?");

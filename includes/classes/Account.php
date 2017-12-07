@@ -18,21 +18,10 @@
 			mysqli_stmt_fetch($stmt);
 			mysqli_stmt_fetch($stmt);
 			mysqli_stmt_fetch($stmt);
-	
 
 			$pword = hash('sha256', $pw );
 			$revv2 = strrev($sess . $pword);
 			$encryPw = hash('sha256', $revv2 );
-
-
-
-			/*
-			$stmt = mysqli_prepare($this->con, "SELECT passworda, fail FROM users WHERE username = ?");
-			mysqli_stmt_bind_param($stmt, "s", $un);
-			mysqli_stmt_execute($stmt);
-			mysqli_stmt_bind_result($stmt, $col1, $failatt);
-			mysqli_stmt_fetch($stmt);
-			mysqli_stmt_fetch($stmt);*/
 
 			if($col1){
 				if($failatt < 3) {
@@ -90,9 +79,8 @@
 		}
 
 		private function insertUserDetails($un, $fn, $ln, $em, $pw) {
-			//$saltplain = $this->rand_str();
+
 			$salthash = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
-			//$salthash = hash('sha256', '$saltplain' );
 			$pwordhash = hash('sha256', $pw);
 			$revv = strrev($salthash . $pwordhash);
 			$encryptedPw = hash('sha256', $revv );

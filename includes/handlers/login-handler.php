@@ -6,6 +6,7 @@ if(isset($_POST['loginButton'])) {
 	$result = $account->login($username, $password);
 
 	if($result) {
+		session_regenerate_id();
 		$_SESSION['userLoggedIn'] = $username;
 		//$name = 'token-' . mt_rand();
 		$token = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));

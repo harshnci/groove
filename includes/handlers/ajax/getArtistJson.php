@@ -7,7 +7,6 @@ if(isset($_POST['artistId'])) {
 	$stmt = mysqli_prepare($con, "SELECT * FROM artists WHERE id = ?");
 	mysqli_stmt_bind_param($stmt, "s", $artistId);
 	mysqli_stmt_execute($stmt);
-	//mysqli_stmt_store_result($stmt);
 	mysqli_stmt_bind_result($stmt, $row[0], $row[1]);
 	while (mysqli_stmt_fetch($stmt)) {
     }
