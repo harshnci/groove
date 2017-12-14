@@ -30,7 +30,7 @@ mysqli_stmt_close($stmt);
 
 if($sess == $_POST['csrf']) {
 	
-	$newencryptedPw = password_hash($newPassword1, PASSWORD_BCRYPT);
+	//$newencryptedPw = password_hash($newPassword1, PASSWORD_BCRYPT);
 
 	$stmt = mysqli_prepare($con, "SELECT salt, passworda FROM users WHERE username = ?");
 	mysqli_stmt_bind_param($stmt, "s", $username);
